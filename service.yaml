@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+  name: waypoint
+  namespace: default
+spec:
+  ports:
+  - name: grpc
+    nodePort: 30582
+    port: 9701
+    protocol: TCP
+    targetPort: 9701
+  - name: http
+    nodePort: 32034
+    port: 9702
+    protocol: TCP
+    targetPort: 9702
+  selector:
+    app: waypoint-server
+  sessionAffinity: None
+  type: LoadBalancer
