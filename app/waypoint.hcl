@@ -6,6 +6,14 @@ app "api" {
       buildkit           = false
       disable_entrypoint = false
     }
+
+    registry {
+      use "aws-ecr" {
+        repository = "hashicorp-dev-hello-world"
+        region     = "eu-west-1"
+        tag        = "v1"
+      }
+    }
   }
 
   deploy {

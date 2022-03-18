@@ -44,3 +44,7 @@ output "kubernetes_token" {
   sensitive = true
   value     = data.aws_eks_cluster_auth.cluster.token
 }
+
+output "ecr_repository" {
+  value = module.ecr.repository_url
+}
