@@ -373,6 +373,7 @@ resource "helm_release" "albingress" {
       "vpcId"                                                     = module.vpc.vpc_id
       "replicaCount"                                              = 1
     }
+
     content {
       name  = set.key
       value = set.value

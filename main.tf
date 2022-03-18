@@ -5,29 +5,43 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "2.0.3"
     }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = "2.0.3"
+    }
+
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 2.28.1"
+    }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 2.1"
+    }
+
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 1.2"
+    }
+
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 2.1"
+    }
+
+    template = {
+      source  = "hashicorp/template"
+      version = "~> 2.1"
+    }
   }
 }
 
 provider "aws" {
-  version = ">= 2.28.1"
-  region  = var.region
+  region = var.region
 }
 
-provider "random" {
-  version = "~> 2.1"
-}
-
-provider "local" {
-  version = "~> 1.2"
-}
-
-provider "null" {
-  version = "~> 2.1"
-}
-
-provider "template" {
-  version = "~> 2.1"
-}
 
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_id
