@@ -66,6 +66,8 @@ spec:
               value: "http://tempo:9411"
             - name: "READY_CHECK_RESPONSE_DELAY"
               value: "10s"
+            - name: "PORT"
+              value: "9090"
           readinessProbe:
             httpGet:
               path: /ready
