@@ -50,3 +50,11 @@ resource "aws_efs_access_point" "waypoint_runner" {
     uid = 100
   }
 }
+
+resource "kubernetes_storage_class" "efs" {
+  metadata {
+    name = "efs-sc"
+  }
+
+  storage_provisioner = "efs.csi.aws.com"
+}

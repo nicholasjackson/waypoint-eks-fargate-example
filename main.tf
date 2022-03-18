@@ -5,11 +5,6 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "2.0.3"
     }
-
-    helm = {
-      source  = "hashicorp/helm"
-      version = "2.0.3"
-    }
   }
 }
 
@@ -56,11 +51,13 @@ provider "helm" {
   }
 }
 
-data "aws_availability_zones" "available" {
-}
+data "aws_availability_zones" "available" {}
+
+data "aws_caller_identity" "current" {}
 
 locals {
-  cluster_name = "test-eks-${random_string.suffix.result}"
+  cluster_name     = "test-eks-${random_string.suffix.result}"
+  image_repository = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/amazon/aws-load-balancer-controller"
 }
 
 resource "random_string" "suffix" {
@@ -72,11 +69,14 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.12.0"
 
-  name                 = var.vpc_name
-  cidr                 = "172.16.0.0/16"
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
-  public_subnets       = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
+  name = var.vpc_name
+
+  cidr = "172.16.0.0/16"
+  azs  = data.aws_availability_zones.available.names
+
+  private_subnets = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
+  public_subnets  = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
+
   enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
@@ -92,3 +92,8 @@ module "vpc" {
   }
 }
 
+resource "aws_kms_key" "eks" {
+  description             = "EKS Secret Encryption Key"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}

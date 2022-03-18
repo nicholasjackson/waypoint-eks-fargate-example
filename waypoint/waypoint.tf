@@ -1,5 +1,5 @@
 resource "helm_release" "waypoint" {
-  depends_on = [module.eks, module.vpc, kubernetes_persistent_volume_claim.waypoint_server]
+  depends_on = [kubernetes_persistent_volume_claim.waypoint_server, kubernetes_persistent_volume_claim.waypoint_runner]
   name       = "waypoint"
 
   repository = "https://helm.releases.hashicorp.com"
