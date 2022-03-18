@@ -2,10 +2,7 @@ project = "testing"
 
 app "api" {
   build {
-    use "docker-pull" {
-      image = "nicholasjackson/fake-service"
-      tag   = "v0.23.1"
-    }
+    use "docker" {}
   }
 
   deploy {
