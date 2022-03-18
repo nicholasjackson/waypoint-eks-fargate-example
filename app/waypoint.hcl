@@ -2,7 +2,10 @@ project = "testing"
 
 app "api" {
   build {
-    use "docker" {}
+    use "docker" {
+      buildkit           = false
+      disable_entrypoint = false
+    }
   }
 
   deploy {
