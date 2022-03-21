@@ -1,4 +1,4 @@
-project = "testing"
+project = "testing1"
 
 app "api" {
   build {
