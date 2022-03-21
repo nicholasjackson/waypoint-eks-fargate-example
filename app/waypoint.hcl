@@ -17,9 +17,8 @@ app "api" {
   }
 
   deploy {
-    use "kubernetes-apply" {
-      path        = templatedir("${path.app}/config")
-      prune_label = "app=api"
+    use "kubernetes" {
+      probe_path = "/"
     }
   }
 }
