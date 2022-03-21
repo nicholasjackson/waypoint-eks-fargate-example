@@ -5,6 +5,7 @@
 * EKS Cluster with Fargate Profile
 * Security Groups and Subnets
 * EFS Volumes and Access Points for Waypoint
+* 
 * Kubernetes Volumes and Claims using EFS for Waypoint
 
 ## Install Terraform 1.13
@@ -26,17 +27,23 @@ sudo ./aws/install
 rm awscliv2.zip
 ```
 
-Create a kubeconfig using the AWS CLI
+## Configure Waypoint
 
-```
-aws eks update-kubeconfig --region $(terraform output --raw region) --name $(terraform output --raw cluster_name)
+Get the address of the Waypoint server from Kubernetes
+
+```shell
+export WAYPOINT_HOST=$(kubectl get svc waypoint-ui -o=jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+export WAYPOINT_TOKEN=$(kubectl get secrets waypoint-server-token -o=jsonpath="{.data.token}" | base64 -d)
+waypoint context create -server-addr="${WAYPOINT_HOST}:9701" -server-auth-token=${WAYPOINT_TOKEN} -server-tls-skip-verify=true -set-default=true -server-require-auth=true eks
 ```
 
-## Install Waypoint
+## Open the Waypoint UI
 
+```shell
+waypoint ui -authenticate
 ```
-waypoint install -platform=kubernetes -accept-tos
-```
+
+## Configure the application
 
 ## Destroying the demo
 

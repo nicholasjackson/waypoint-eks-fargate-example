@@ -5,14 +5,19 @@ resource "aws_iam_role" "odr_runner" {
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
-          "Sid": "",
-          "Effect": "Allow",
-          "Principal": {
-              "Service": "eks-fargate-pods.amazonaws.com"
-          },
-          "Action": "sts:AssumeRole"
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "${data.terraform_remote_state.eks.outputs.oidc_provider_arn}"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "${data.terraform_remote_state.eks.outputs.oidc_provider}:aud": "sts.amazonaws.com",
+          "${data.terraform_remote_state.eks.outputs.oidc_provider}:sub": "system:serviceaccount:default:waypoint-runner-odr"
+        }
       }
+    }
   ]
 }
 EOF

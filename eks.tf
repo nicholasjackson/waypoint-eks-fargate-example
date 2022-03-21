@@ -351,6 +351,12 @@ resource "aws_iam_policy_attachment" "albingress" {
   policy_arn = aws_iam_policy.albingress.arn
 }
 
+resource "aws_iam_policy_attachment" "albingress-ecr" {
+  name       = "albingress-ecr"
+  roles      = [aws_iam_role.albingress.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 locals {
   alb_service_account = "aws-alb-ingress-controller"
 }
