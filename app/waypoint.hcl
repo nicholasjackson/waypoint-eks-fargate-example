@@ -11,7 +11,7 @@ app "api" {
       use "aws-ecr" {
         repository = "hashicorp-dev-hello-world"
         region     = "eu-west-1"
-        tag        = "v3"
+        tag        = "v1"
       }
     }
   }
