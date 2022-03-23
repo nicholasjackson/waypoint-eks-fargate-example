@@ -157,6 +157,17 @@ Hello World%
 Running resources cost money so do not forget to tear down your cluster, you can run the `terraform destroy` command to remove 
 all the resources you have created.
 
+The AWS Load Balancing controller does not always destroy the resources it creates when removing the Helm chart, since the 
+ALBs are associated with the Terraform created VPC `terraform destroy` will fail if any of the load balancers are not removed.
+
+To manually remove the ALBs, you can use the following command:
+
+```shell
+kubectl delete svc --all
+```
+
+Then you can destroy the resources with Terraform as normal.
+
 ```shell
 terraform destroy
 ```
