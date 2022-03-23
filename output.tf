@@ -17,20 +17,20 @@ output "region" {
   value       = var.region
 }
 
-output "efs_access_point_server_id" {
-  description = "EFS filesystem for Waypoint Server"
-  value       = aws_efs_access_point.waypoint_server.*.id
-}
-
-output "efs_access_point_runner_id" {
-  description = "EFS filesystem for Waypoint Runner"
-  value       = aws_efs_access_point.waypoint_runner.*.id
-}
-
-output "efs_file_system_id" {
-  description = "EFS filesystem for Waypoint"
-  value       = aws_efs_file_system.waypoint.id
-}
+#output "efs_access_point_server_id" {
+#  description = "EFS filesystem for Waypoint Server"
+#  value       = aws_efs_access_point.waypoint_server.*.id
+#}
+#
+#output "efs_access_point_runner_id" {
+#  description = "EFS filesystem for Waypoint Runner"
+#  value       = aws_efs_access_point.waypoint_runner.*.id
+#}
+#
+#output "efs_file_system_id" {
+#  description = "EFS filesystem for Waypoint"
+#  value       = aws_efs_file_system.waypoint.id
+#}
 
 output "kubernetes_endpoint" {
   value = data.aws_eks_cluster.cluster.endpoint
@@ -43,10 +43,6 @@ output "kubernetes_certificate" {
 output "kubernetes_token" {
   sensitive = true
   value     = data.aws_eks_cluster_auth.cluster.token
-}
-
-output "ecr_repository" {
-  value = module.ecr.repository_url
 }
 
 output "oidc_provider_arn" {

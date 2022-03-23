@@ -19,6 +19,7 @@ app "api" {
   deploy {
     use "kubernetes" {
       probe_path = "/"
+      namespace  = "waypoint-apps"
     }
   }
 }

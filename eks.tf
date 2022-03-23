@@ -23,6 +23,10 @@ module "eks" {
       resolve_conflicts = "OVERWRITE"
     }
 
+    coredns = {
+      resolve_conflicts = "OVERWRITE"
+    }
+
     kube-proxy = {}
   }
 
@@ -31,13 +35,80 @@ module "eks" {
     resources        = ["secrets"]
   }]
 
+  # Extend cluster security group rules
+  cluster_security_group_additional_rules = {
+    egress_nodes_ephemeral_ports_tcp = {
+      description                = "To node 1025-65535"
+      protocol                   = "tcp"
+      from_port                  = 1025
+      to_port                    = 65535
+      type                       = "egress"
+      source_node_security_group = true
+    }
+  }
+
+  # Extend node-to-node security group rules
+  node_security_group_additional_rules = {
+    ingress_self_all = {
+      description = "Node to node all ports/protocols"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+    egress_all = {
+      description      = "Node all egress"
+      protocol         = "-1"
+      from_port        = 0
+      to_port          = 0
+      type             = "egress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+  }
+
+  eks_managed_node_groups = {
+    green = {
+      min_size     = 1
+      max_size     = 10
+      desired_size = 1
+
+      instance_types = ["t3.large"]
+      capacity_type  = "SPOT"
+
+      labels = {
+        Environment = "test"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
+      }
+
+      tags = {
+        ExtraTag = "example"
+      }
+
+      security_group_rules = {
+        ingress = {
+          description = "TLS from VPC"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          type        = "ingress"
+          cidr_blocks = [module.vpc.vpc_cidr_block]
+        }
+      }
+    }
+  }
+
   fargate_profiles = {
-    default = {
-      iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"]
-      name                         = "default"
+    waypoint-apps = {
+      # Ensure Fargate pods can pull from ECR
+      iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"]
+
+      name = "waypoint-apps"
       selectors = [
         {
-          namespace = "default"
+          namespace = "waypoint-apps"
         }
       ]
 
@@ -47,19 +118,6 @@ module "eks" {
       }
     }
 
-    system = {
-      name = "system"
-      selectors = [
-        {
-          namespace = "kube-system"
-        }
-      ]
-
-      timeouts = {
-        create = "20m"
-        delete = "20m"
-      }
-    }
   }
 }
 
@@ -72,17 +130,6 @@ resource "null_resource" "add_core_dns" {
       aws eks update-kubeconfig \
         --region ${var.region} \
         --name ${local.cluster_name};
-
-      aws eks create-addon \
-        --region ${var.region} \
-        --cluster-name ${local.cluster_name} \
-        --addon-name coredns \
-        --resolve-conflicts OVERWRITE;
-
-      kubectl patch deployment coredns \
-        --namespace kube-system \
-        --type=json \
-        -p='[{"op": "remove", "path": "/spec/template/metadata/annotations", "value": "eks.amazonaws.com/compute-type"}]';
     EOF
   }
 }

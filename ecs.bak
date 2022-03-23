@@ -1,0 +1,19 @@
+module "ecr_cache" {
+  source               = "cloudposse/ecr/aws"
+  namespace            = "hashicorp"
+  stage                = "dev"
+  name                 = "cache"
+  image_tag_mutability = "MUTABLE"
+  //principals_full_access = ["arn:aws:iam::938765688536:role/waypoint-runner", "arn:aws:iam::938765688536:role/waypoint-server-execution-role"]
+
+  tags = {
+    Environment = "Development"
+    Owner       = "Nic Jackson"
+    Project     = "Waypoint ECS Test"
+  }
+}
+
+resource "aws_ecr_pull_through_cache_rule" "docker_io" {
+  ecr_repository_prefix = "cache"
+  upstream_registry_url = "docker.io"
+}

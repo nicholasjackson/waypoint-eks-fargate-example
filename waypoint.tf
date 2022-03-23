@@ -8,13 +8,13 @@ resource "aws_iam_role" "odr_runner" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "${data.terraform_remote_state.eks.outputs.oidc_provider_arn}"
+        "Federated": "${module.eks.oidc_provider_arn}"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "${data.terraform_remote_state.eks.outputs.oidc_provider}:aud": "sts.amazonaws.com",
-          "${data.terraform_remote_state.eks.outputs.oidc_provider}:sub": "system:serviceaccount:default:waypoint-runner-odr"
+          "${module.eks.oidc_provider}:aud": "sts.amazonaws.com",
+          "${module.eks.oidc_provider}:sub": "system:serviceaccount:default:waypoint-runner-odr"
         }
       }
     }
@@ -46,7 +46,7 @@ resource "aws_iam_policy_attachment" "odr_runner_ecr" {
 }
 
 resource "helm_release" "waypoint" {
-  depends_on = [kubernetes_persistent_volume_claim.waypoint_server, kubernetes_persistent_volume_claim.waypoint_runner]
+  depends_on = ["helm_release.albingress"]
   name       = "waypoint"
 
   repository = "https://helm.releases.hashicorp.com"
